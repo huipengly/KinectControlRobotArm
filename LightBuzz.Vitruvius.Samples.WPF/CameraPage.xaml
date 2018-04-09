@@ -1,0 +1,50 @@
+﻿<Page x:Class="LightBuzz.Vituvius.Samples.WPF.CameraPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:controls="clr-namespace:LightBuzz.Vitruvius.Controls;assembly=LightBuzz.Vitruvius"
+      mc:Ignorable="d" 
+      d:DesignHeight="700" d:DesignWidth="900"
+      Title="Camera"
+      Unloaded="Page_Unloaded">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Back button and page title -->
+        <Grid Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="backButton" Click="Back_Click"
+                    Style="{StaticResource NavigationBackButtonNormalStyle}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    AutomationProperties.Name="Back"
+                    AutomationProperties.AutomationId="BackButton"
+                    AutomationProperties.ItemType="Navigation Button"/>
+            <TextBlock x:Name="pageTitle" Text="Camera" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
+                        IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Center" />
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Margin="60,0,0,0">
+                <Button Style="{StaticResource ButtonCommonStyle}" Content="Color" Click="Color_Click" />
+                <Button Style="{StaticResource ButtonCommonStyle}" Content="Depth" Click="Depth_Click" />
+                <Button Style="{StaticResource ButtonCommonStyle}" Content="Infrared" Click="Infrared_Click" />
+                <CheckBox Foreground="White" Margin="4,8" Content="Toggle Skeleton" Checked="Skeleton_Checked" Unchecked="Skeleton_Unchecked" />
+                <Button Style="{StaticResource ButtonCommonStyle}" Content="Save snapshot" Click="Save_Click" />
+            </StackPanel>
+            <controls:KinectViewer Grid.Column="1" x:Name="viewer" />
+        </Grid>
+    </Grid>
+</Page>

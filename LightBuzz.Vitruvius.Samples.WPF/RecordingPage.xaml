@@ -1,0 +1,50 @@
+﻿<Page x:Class="LightBuzz.Vituvius.Samples.WPF.RecordingPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:LightBuzz.Vituvius.Samples.WPF"
+      xmlns:controls="clr-namespace:LightBuzz.Vitruvius.Controls;assembly=LightBuzz.Vitruvius"
+      mc:Ignorable="d" 
+      d:DesignHeight="700" d:DesignWidth="900"
+      Title="Recording and Playback"
+      Unloaded="Page_Unloaded">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Back button and page title -->
+        <Grid Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="backButton" Click="Back_Click"
+                    Style="{StaticResource NavigationBackButtonNormalStyle}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    AutomationProperties.Name="Back"
+                    AutomationProperties.AutomationId="BackButton"
+                    AutomationProperties.ItemType="Navigation Button"/>
+            <TextBlock x:Name="pageTitle" Text="Recording &amp; Playback" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
+                        IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Center" />
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="240" />
+                <ColumnDefinition Width="0.7*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Margin="60,0,0,0">
+                <TextBlock Style="{StaticResource SubheaderTextBlockStyle}" Text="Record" Margin="0,20" />
+                <Button Style="{StaticResource ButtonCommonStyle}" Content="Toggle Recording" Click="Record_Click" />
+                <TextBlock Style="{StaticResource SubheaderTextBlockStyle}" Text="Playback" Margin="0,20" />
+                <Button Style="{StaticResource ButtonCommonStyle}" Content="Toggle Playback" Click="Playback_Click" />
+            </StackPanel>
+            <controls:KinectViewer Grid.Column="1" x:Name="viewer" Visualization="Infrared" />
+        </Grid>
+    </Grid>
+</Page>

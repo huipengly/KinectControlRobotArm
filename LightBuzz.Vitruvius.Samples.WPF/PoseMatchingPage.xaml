@@ -1,0 +1,47 @@
+﻿<Page x:Class="LightBuzz.Vituvius.Samples.WPF.PoseMatchingPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:LightBuzz.Vituvius.Samples.WPF"
+      xmlns:controls="clr-namespace:LightBuzz.Vitruvius.Controls;assembly=LightBuzz.Vitruvius"
+      mc:Ignorable="d" 
+      d:DesignHeight="300" d:DesignWidth="900"
+      Title="PoseMatchingPage"
+      Unloaded="Page_Unloaded">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Back button and page title -->
+        <Grid Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="backButton" Click="Back_Click"
+                    Style="{StaticResource NavigationBackButtonNormalStyle}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    AutomationProperties.Name="Back"
+                    AutomationProperties.AutomationId="BackButton"
+                    AutomationProperties.ItemType="Navigation Button"/>
+            <TextBlock x:Name="pageTitle" Text="Pose Matching" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
+                        IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Center" />
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.3*" />
+                <ColumnDefinition Width="0.7*" />
+            </Grid.ColumnDefinitions>
+            <controls:KinectViewer x:Name="viewer1" Grid.Column="0" />
+            <controls:KinectViewer x:Name="viewer2" Grid.Column="1" />
+
+            <Button Grid.Column="0" Style="{StaticResource ButtonCommonStyle}" Content="Capture Pose" Margin="20" Padding="30,8" HorizontalAlignment="Center" VerticalAlignment="Bottom" Click="Capture_Click" />
+        </Grid>
+    </Grid>
+</Page>
