@@ -3,6 +3,18 @@ using Microsoft.Kinect;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
+using System.Collections.Generic;
+using System;
+using TwinCAT.Ads;
+
+static class Constants
+{
+    public const int shoulder = 1;
+    public const int elbow = 2;
+    public const int wrist = 3;
+    public const int hand = 4;
+
+}
 
 namespace LightBuzz.Vituvius.Samples.WPF
 {
@@ -27,9 +39,18 @@ namespace LightBuzz.Vituvius.Samples.WPF
         JointType _center3 = JointType.KneeRight;
         JointType _end3 = JointType.HipRight;
 
+        List<double> arrayShoulder = new List<double>();
+        List<double> arrayElbow = new List<double>();
+        List<double> arrayWrist = new List<double>();
+        List<long> runTime = new List<long>();
+        private TcAdsClient _tcClient;
+        private AdsStream adsWriteStream;
+        private AdsStream adsReadStream;
+
         public AnglePage()
         {
             InitializeComponent();
+            ConnectAds();
 
             _sensor = KinectSensor.GetDefault();
 
@@ -45,6 +66,27 @@ namespace LightBuzz.Vituvius.Samples.WPF
                 _playersController.BodyLeft += UserReporter_BodyLeft;
                 _playersController.Start();
             }
+        }
+
+        private void ConnectAds()
+        {
+            _tcClient = new TcAdsClient();
+            adsReadStream = new AdsStream(4);
+            adsWriteStream = new AdsStream(4);
+
+            string netid = "5.53.53.126.1.1";
+            int net_port = 0x8888;
+            AmsAddress serverAddress = new AmsAddress(netid, net_port); //配置服务端地址
+           _tcClient.Connect(serverAddress.NetId, serverAddress.Port);  //连接服务端
+        }
+
+        private void adsSendData(long type, double data)
+        {
+            AdsBinaryWriter binWriter = new AdsBinaryWriter(adsWriteStream);
+            adsWriteStream.Position = 0;
+
+            binWriter.Write(data);
+            _tcClient.Write(0x3, type, adsWriteStream);//发送数据
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -114,13 +156,23 @@ namespace LightBuzz.Vituvius.Samples.WPF
                         angle2.Update(spine, shoulder, elbow, 50);
                         angle3.Update(elbow, wrist, hand, 50);
 
-                        double angleWrist = wrist.Angle(elbow, hand, Axis.Y);
-                        double angleElbow = elbow.Angle(shoulder, wrist, Axis.Y);
                         double angleShoulder = shoulder.Angle(spine, elbow, Axis.Y);
+                        double angleElbow = elbow.Angle(shoulder, wrist, Axis.Y);
+                        double angleWrist = wrist.Angle(elbow, hand, Axis.Y);
 
                         tblAngle1.Text = ((int)angleElbow).ToString();
                         tblAngle2.Text = ((int)angleShoulder).ToString();
                         tblAngle3.Text = ((int)angleWrist).ToString();
+
+                        arrayShoulder.Add(angleShoulder);
+                        arrayElbow.Add(angleElbow);
+                        arrayWrist.Add(angleWrist);
+
+                        runTime.Add(DateTime.Now.Ticks);//1Ticks = 0.0001毫秒
+
+                        adsSendData(Constants.shoulder, angleShoulder);
+                        adsSendData(Constants.elbow, angleElbow);
+                        adsSendData(Constants.wrist, angleWrist);
                     }
                 }
             }
