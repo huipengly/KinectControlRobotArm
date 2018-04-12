@@ -51,7 +51,6 @@ namespace LightBuzz.Vituvius.Samples.WPF
         {
             InitializeComponent();
             ConnectAds();
-            adsSendData(1, 0.1);
 
             _sensor = KinectSensor.GetDefault();
 
@@ -73,21 +72,25 @@ namespace LightBuzz.Vituvius.Samples.WPF
         {
             _tcClient = new TcAdsClient();
 
-            string netid = "5.53.53.126.1.1";
+            string netid = "5.39.221.128.1.1";
             int net_port = 0x8888;
             AmsAddress serverAddress = new AmsAddress(netid, net_port); //配置服务端地址
            _tcClient.Connect(serverAddress.NetId, serverAddress.Port);  //连接服务端
         }
 
-        private void adsSendData(long type, double data)
+        private void adsSendData(double shoulderLevelShift, double elbow, double wrist, double hand)
         {
-            //adsReadStream = new AdsStream(40);
-            adsWriteStream = new AdsStream(sizeof(double));
+            adsReadStream = new AdsStream(40);
+            adsWriteStream = new AdsStream(sizeof(double)*4);
             AdsBinaryWriter binWriter = new AdsBinaryWriter(adsWriteStream);
             adsWriteStream.Position = 0;
 
-            binWriter.Write(data);
-            _tcClient.Write(0x3, type, adsWriteStream);//发送数据
+            binWriter.Write(shoulderLevelShift);
+            binWriter.Write(elbow);
+            binWriter.Write(wrist);
+            binWriter.Write(hand);
+
+            _tcClient.ReadWrite(0x1, 0x1, null, adsWriteStream);
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -171,9 +174,7 @@ namespace LightBuzz.Vituvius.Samples.WPF
 
                         runTime.Add(DateTime.Now.Ticks);//1Ticks = 0.0001毫秒
 
-                        adsSendData(Constants.shoulder, angleShoulder);
-                        adsSendData(Constants.elbow, angleElbow);
-                        adsSendData(Constants.wrist, angleWrist);
+                        adsSendData(angleShoulder, angleElbow, angleWrist, 1);
                     }
                 }
             }
