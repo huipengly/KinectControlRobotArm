@@ -51,6 +51,7 @@ namespace LightBuzz.Vituvius.Samples.WPF
         {
             InitializeComponent();
             ConnectAds();
+            adsSendData(1, 0.1);
 
             _sensor = KinectSensor.GetDefault();
 
@@ -71,8 +72,6 @@ namespace LightBuzz.Vituvius.Samples.WPF
         private void ConnectAds()
         {
             _tcClient = new TcAdsClient();
-            adsReadStream = new AdsStream(4);
-            adsWriteStream = new AdsStream(4);
 
             string netid = "5.53.53.126.1.1";
             int net_port = 0x8888;
@@ -82,6 +81,8 @@ namespace LightBuzz.Vituvius.Samples.WPF
 
         private void adsSendData(long type, double data)
         {
+            //adsReadStream = new AdsStream(40);
+            adsWriteStream = new AdsStream(sizeof(double));
             AdsBinaryWriter binWriter = new AdsBinaryWriter(adsWriteStream);
             adsWriteStream.Position = 0;
 
