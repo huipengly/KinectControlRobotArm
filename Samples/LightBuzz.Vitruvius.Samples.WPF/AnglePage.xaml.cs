@@ -13,7 +13,7 @@ static class Constants
     public const int elbow = 2;
     public const int wrist = 3;
     public const int hand = 4;
-
+    public const int medianFilterRange = 30;
 }
 
 namespace LightBuzz.Vituvius.Samples.WPF
@@ -42,7 +42,12 @@ namespace LightBuzz.Vituvius.Samples.WPF
         List<double> arrayShoulder = new List<double>();
         List<double> arrayElbow = new List<double>();
         List<double> arrayWrist = new List<double>();
+        List<double> arrayShoulder_median_filter = new List<double>();
+        List<double> arrayElbow_median_filter = new List<double>();
+        List<double> arrayWrist_median_filter = new List<double>();
         List<long> runTime = new List<long>();
+        int medStart;
+        int medEnd;
         private TcAdsClient _tcClient;
         private AdsStream adsWriteStream;
         private AdsStream adsReadStream;
@@ -51,6 +56,9 @@ namespace LightBuzz.Vituvius.Samples.WPF
         {
             InitializeComponent();
             ConnectAds();
+
+            medStart = 0;
+            medEnd = medStart + Constants.medianFilterRange;
 
             _sensor = KinectSensor.GetDefault();
 
@@ -168,13 +176,29 @@ namespace LightBuzz.Vituvius.Samples.WPF
                         tblAngle2.Text = ((int)angleShoulder).ToString();
                         tblAngle3.Text = ((int)angleWrist).ToString();
 
+                        //原始数据
                         arrayShoulder.Add(angleShoulder);
                         arrayElbow.Add(angleElbow);
                         arrayWrist.Add(angleWrist);
 
                         runTime.Add(DateTime.Now.Ticks);//1Ticks = 0.0001毫秒
 
-                        adsSendData(angleShoulder, angleElbow, angleWrist, 1);
+                        if (arrayShoulder.Count > Constants.medianFilterRange)
+                        {
+                            List<double> tempShoulder = arrayShoulder.GetRange(medStart, medEnd);
+                            List<double> tempElbow = arrayElbow.GetRange(medStart, medEnd);
+                            List<double> tempWrist = arrayWrist.GetRange(medStart, medEnd);
+
+                            tempShoulder.Sort();
+                            tempElbow.Sort();
+                            tempWrist.Sort();
+
+                            double shoulderData = tempShoulder[Constants.medianFilterRange / 2];
+                            double elbowData = tempElbow[Constants.medianFilterRange / 2];
+                            double wristData = tempWrist[Constants.medianFilterRange / 2];
+
+                            adsSendData(shoulderData, elbowData, wristData, 1);
+                        }
                     }
                 }
             }
