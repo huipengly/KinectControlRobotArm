@@ -185,9 +185,11 @@ namespace LightBuzz.Vituvius.Samples.WPF
 
                         if (arrayShoulder.Count > Constants.medianFilterRange)
                         {
-                            List<double> tempShoulder = arrayShoulder.GetRange(medStart, medEnd);
-                            List<double> tempElbow = arrayElbow.GetRange(medStart, medEnd);
-                            List<double> tempWrist = arrayWrist.GetRange(medStart, medEnd);
+                            List<double> tempShoulder = arrayShoulder.GetRange(medStart, Constants.medianFilterRange);
+                            List<double> tempElbow = arrayElbow.GetRange(medStart, Constants.medianFilterRange);
+                            List<double> tempWrist = arrayWrist.GetRange(medStart, Constants.medianFilterRange);
+                            ++medStart;
+                            ++medEnd;
 
                             tempShoulder.Sort();
                             tempElbow.Sort();
@@ -196,6 +198,10 @@ namespace LightBuzz.Vituvius.Samples.WPF
                             double shoulderData = tempShoulder[Constants.medianFilterRange / 2];
                             double elbowData = tempElbow[Constants.medianFilterRange / 2];
                             double wristData = tempWrist[Constants.medianFilterRange / 2];
+
+                            arrayShoulder_median_filter.Add(shoulderData);
+                            arrayElbow_median_filter.Add(elbowData);
+                            arrayWrist_median_filter.Add(wristData);
 
                             adsSendData(shoulderData, elbowData, wristData, 1);
                         }
