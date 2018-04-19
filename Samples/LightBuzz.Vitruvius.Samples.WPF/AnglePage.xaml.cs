@@ -199,11 +199,36 @@ namespace LightBuzz.Vituvius.Samples.WPF
                             double elbowData = tempElbow[Constants.medianFilterRange / 2];
                             double wristData = tempWrist[Constants.medianFilterRange / 2];
 
-                            arrayShoulder_median_filter.Add(shoulderData);
-                            arrayElbow_median_filter.Add(elbowData);
-                            arrayWrist_median_filter.Add(wristData);
+                            if (arrayShoulder_median_filter.Count != 0)
+                            {
+                                double diff_shoulder_data = 0;
+                                double diff_elbow_data = 0;
+                                double diff_wrist_data = 0;
 
-                            adsSendData(shoulderData, elbowData, wristData, 1);
+                                double last_shoulder = arrayShoulder_median_filter[arrayShoulder_median_filter.Count - 1];
+                                double last_elbow = arrayElbow_median_filter[arrayElbow_median_filter.Count - 1];
+                                double last_wrist = arrayWrist_median_filter[arrayWrist_median_filter.Count - 1];
+
+                                diff_shoulder_data = shoulderData - last_shoulder;
+                                diff_elbow_data = elbowData - last_elbow;
+                                diff_wrist_data = wristData - last_wrist;
+
+                                //Kinect采集是30hz，机械臂是100hz.这里把采集角度变化四等分，弄成假120hz，有偏差。
+                                for(int i = 1; i < 5; ++i)
+                                {
+                                    arrayShoulder_median_filter.Add(last_shoulder + diff_shoulder_data * i/4);
+                                    arrayElbow_median_filter.Add(last_elbow + diff_elbow_data * i/4);
+                                    arrayWrist_median_filter.Add(last_wrist + diff_wrist_data * i/4);
+                                }
+                            }
+                            else//首次数据不等分
+                            {
+                                arrayShoulder_median_filter.Add(shoulderData);
+                                arrayElbow_median_filter.Add(elbowData);
+                                arrayWrist_median_filter.Add(wristData);
+                            }
+
+                            //adsSendData(shoulderData, elbowData, wristData, 1);
                         }
                     }
                 }
