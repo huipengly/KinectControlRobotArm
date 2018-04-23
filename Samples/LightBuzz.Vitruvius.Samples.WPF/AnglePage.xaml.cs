@@ -27,17 +27,17 @@ namespace LightBuzz.Vituvius.Samples.WPF
         MultiSourceFrameReader _reader;
         PlayersController _playersController;
 
-        JointType _start1 = JointType.ShoulderRight;
-        JointType _center1 = JointType.ElbowRight;
-        JointType _end1 = JointType.WristRight;
+        //JointType _start1 = JointType.ShoulderRight;
+        //JointType _center1 = JointType.ElbowRight;
+        //JointType _end1 = JointType.WristRight;
 
-        JointType _start2 = JointType.ElbowLeft;
-        JointType _center2 = JointType.ShoulderLeft;
-        JointType _end2 = JointType.SpineShoulder;
+        //JointType _start2 = JointType.ElbowLeft;
+        //JointType _center2 = JointType.ShoulderLeft;
+        //JointType _end2 = JointType.SpineShoulder;
 
-        JointType _start3 = JointType.AnkleRight;
-        JointType _center3 = JointType.KneeRight;
-        JointType _end3 = JointType.HipRight;
+        //JointType _start3 = JointType.AnkleRight;
+        //JointType _center3 = JointType.KneeRight;
+        //JointType _end3 = JointType.HipRight;
 
         List<double> arrayShoulder = new List<double>();
         List<double> arrayElbow = new List<double>();
@@ -47,6 +47,7 @@ namespace LightBuzz.Vituvius.Samples.WPF
         List<double> arrayElbow_median_filter = new List<double>();
         List<double> arrayWrist_median_filter = new List<double>();
         double hand_status;
+        int lasso_counter;
         List<long> runTime = new List<long>();
         int medStart;
         int medEnd;
@@ -59,6 +60,7 @@ namespace LightBuzz.Vituvius.Samples.WPF
             InitializeComponent();
             ConnectAds();
 
+            lasso_counter = 0;
             medStart = 0;
             medEnd = medStart + Constants.medianFilterRange;
 
@@ -187,11 +189,20 @@ namespace LightBuzz.Vituvius.Samples.WPF
                         arrayHand.Add(body.HandRightState.GetHashCode());
                         
                         if ((body.HandRightState == HandState.Open) ||
-                            (body.HandRightState == HandState.Closed) ||
-                            (body.HandRightState == HandState.Lasso))
+                            (body.HandRightState == HandState.Closed))
                         {
                             hand_status = body.HandRightState.GetHashCode();
                             tblAngle4.Text = body.HandRightState.ToString();
+                        }
+                        if (body.HandRightState == HandState.Lasso)
+                        {
+                            lasso_counter++;
+                            if(lasso_counter >= 10)//TODO:考虑清零的问题
+                            {
+                                hand_status = body.HandRightState.GetHashCode();
+                                tblAngle4.Text = body.HandRightState.ToString();
+                                lasso_counter = 0;
+                            }
                         }
 
                         runTime.Add(DateTime.Now.Ticks);//1Ticks = 0.0001毫秒
@@ -241,7 +252,7 @@ namespace LightBuzz.Vituvius.Samples.WPF
                                 arrayWrist_median_filter.Add(wristData);
                             }
 
-                            adsSendData(shoulderData, elbowData, wristData, body.HandRightState.GetHashCode());
+                            adsSendData(shoulderData, elbowData, wristData, hand_status);
                         }
                     }
                 }
