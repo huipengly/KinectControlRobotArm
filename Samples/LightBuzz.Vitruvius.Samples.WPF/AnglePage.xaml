@@ -25,7 +25,7 @@
                     Style="{StaticResource NavigationBackButtonNormalStyle}"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"/>
-            <TextBlock x:Name="pageTitle" Text="Angles" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
+            <TextBlock x:Name="pageTitle" Text="RobotArm" Style="{StaticResource HeaderTextBlockStyle}" Grid.Column="1" 
                        IsHitTestVisible="false" TextWrapping="NoWrap" VerticalAlignment="Center" />
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,10,0">
                 <Border Width="80">
@@ -50,6 +50,22 @@
                     </Border.Background>
                     <TextBlock Style="{StaticResource HeaderTextBlockStyle}" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Run x:Name="tblAngle3" Text="-" />°
+                    </TextBlock>
+                </Border>
+                <Border Width="140" Margin="10,0">
+                    <Border.Background>
+                        <SolidColorBrush Color="White" Opacity="0.7" />
+                    </Border.Background>
+                    <TextBlock Style="{StaticResource HeaderTextBlockStyle}" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Run x:Name="tblAngle4" Text="-" />
+                    </TextBlock>
+                </Border>
+                <Border Width="140" Margin="10,0">
+                    <Border.Background>
+                        <SolidColorBrush Color="Yellow" Opacity="0.7" />
+                    </Border.Background>
+                    <TextBlock Style="{StaticResource HeaderTextBlockStyle}" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Run x:Name="tblAngle5" Text="-" />
                     </TextBlock>
                 </Border>
             </StackPanel>

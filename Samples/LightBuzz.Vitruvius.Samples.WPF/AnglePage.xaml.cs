@@ -13,7 +13,7 @@ static class Constants
     public const int elbow = 2;
     public const int wrist = 3;
     public const int hand = 4;
-    public const int medianFilterRange = 30;
+    public const int medianFilterRange = 6;
 }
 
 namespace LightBuzz.Vituvius.Samples.WPF
@@ -42,9 +42,11 @@ namespace LightBuzz.Vituvius.Samples.WPF
         List<double> arrayShoulder = new List<double>();
         List<double> arrayElbow = new List<double>();
         List<double> arrayWrist = new List<double>();
+        List<double> arrayHand = new List<double>();
         List<double> arrayShoulder_median_filter = new List<double>();
         List<double> arrayElbow_median_filter = new List<double>();
         List<double> arrayWrist_median_filter = new List<double>();
+        double hand_status;
         List<long> runTime = new List<long>();
         int medStart;
         int medEnd;
@@ -97,8 +99,8 @@ namespace LightBuzz.Vituvius.Samples.WPF
             binWriter.Write(elbow);
             binWriter.Write(wrist);
             binWriter.Write(hand);
-
-            _tcClient.ReadWrite(0x1, 0x1, null, adsWriteStream);
+            
+            //_tcClient.ReadWrite(0x1, 0x1, null, adsWriteStream);
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -153,6 +155,7 @@ namespace LightBuzz.Vituvius.Samples.WPF
                     _playersController.Update(bodies);
 
                     Body body = bodies.Closest();
+                    //body.HandLeftState;
 
                     if (body != null)
                     {
@@ -164,22 +167,32 @@ namespace LightBuzz.Vituvius.Samples.WPF
                         Joint wrist = body.Joints[JointType.WristRight];
                         Joint hand = body.Joints[JointType.HandRight];
 
-                        angle1.Update(shoulder, elbow, wrist, 50);
-                        angle2.Update(spine, shoulder, elbow, 50);
+                        angle2.Update(shoulder, elbow, wrist, 50);
+                        angle1.Update(spine, shoulder, elbow, 50);
                         angle3.Update(elbow, wrist, hand, 50);
 
                         double angleShoulder = shoulder.Angle(spine, elbow, Axis.Y);
                         double angleElbow = elbow.Angle(shoulder, wrist, Axis.Y);
                         double angleWrist = wrist.Angle(elbow, hand, Axis.Y);
 
-                        tblAngle1.Text = ((int)angleElbow).ToString();
-                        tblAngle2.Text = ((int)angleShoulder).ToString();
+                        tblAngle1.Text = ((int)angleShoulder).ToString();
+                        tblAngle2.Text = ((int)angleElbow).ToString();
                         tblAngle3.Text = ((int)angleWrist).ToString();
+                        tblAngle5.Text = body.HandRightState.ToString();
 
                         //原始数据
                         arrayShoulder.Add(angleShoulder);
                         arrayElbow.Add(angleElbow);
                         arrayWrist.Add(angleWrist);
+                        arrayHand.Add(body.HandRightState.GetHashCode());
+                        
+                        if ((body.HandRightState == HandState.Open) ||
+                            (body.HandRightState == HandState.Closed) ||
+                            (body.HandRightState == HandState.Lasso))
+                        {
+                            hand_status = body.HandRightState.GetHashCode();
+                            tblAngle4.Text = body.HandRightState.ToString();
+                        }
 
                         runTime.Add(DateTime.Now.Ticks);//1Ticks = 0.0001毫秒
 
@@ -228,7 +241,7 @@ namespace LightBuzz.Vituvius.Samples.WPF
                                 arrayWrist_median_filter.Add(wristData);
                             }
 
-                            //adsSendData(shoulderData, elbowData, wristData, 1);
+                            adsSendData(shoulderData, elbowData, wristData, body.HandRightState.GetHashCode());
                         }
                     }
                 }
