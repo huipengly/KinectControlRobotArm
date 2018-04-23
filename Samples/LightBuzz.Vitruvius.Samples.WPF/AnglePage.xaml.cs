@@ -46,8 +46,10 @@ namespace LightBuzz.Vituvius.Samples.WPF
         List<double> arrayShoulder_median_filter = new List<double>();
         List<double> arrayElbow_median_filter = new List<double>();
         List<double> arrayWrist_median_filter = new List<double>();
+        List<double> arrayShoulder_send = new List<double>();
         double hand_status;
         int lasso_counter;
+        int shoulder_counter;
         List<long> runTime = new List<long>();
         int medStart;
         int medEnd;
@@ -61,9 +63,10 @@ namespace LightBuzz.Vituvius.Samples.WPF
             ConnectAds();
 
             lasso_counter = 0;
+            shoulder_counter = 0;
             medStart = 0;
             medEnd = medStart + Constants.medianFilterRange;
-
+            
             _sensor = KinectSensor.GetDefault();
 
             if (_sensor != null)
@@ -101,8 +104,20 @@ namespace LightBuzz.Vituvius.Samples.WPF
             binWriter.Write(elbow);
             binWriter.Write(wrist);
             binWriter.Write(hand);
-            
+
             //_tcClient.ReadWrite(0x1, 0x1, null, adsWriteStream);
+        }
+
+        private void adsSendShoulder(double shoulderLevelShift)
+        {
+            //adsReadStream = new AdsStream(40);
+            adsWriteStream = new AdsStream(sizeof(double));
+            AdsBinaryWriter binWriter = new AdsBinaryWriter(adsWriteStream);
+            adsWriteStream.Position = 0;
+
+            binWriter.Write(shoulderLevelShift);
+
+            //_tcClient.ReadWrite(0x1, 0x2, null, adsWriteStream);
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -237,13 +252,17 @@ namespace LightBuzz.Vituvius.Samples.WPF
                                 diff_elbow_data = elbowData - last_elbow;
                                 diff_wrist_data = wristData - last_wrist;
 
-                                //Kinect采集是30hz，机械臂是100hz.这里把采集角度变化四等分，弄成假120hz，有偏差。
+                                //对肘关节、腕关节差值。Kinect采集是30hz，机械臂是100hz.这里把采集角度变化四等分，弄成假120hz，有偏差。
                                 for(int i = 1; i < 5; ++i)
                                 {
-                                    arrayShoulder_median_filter.Add(last_shoulder + diff_shoulder_data * i/4);
                                     arrayElbow_median_filter.Add(last_elbow + diff_elbow_data * i/4);
                                     arrayWrist_median_filter.Add(last_wrist + diff_wrist_data * i/4);
                                 }
+                                //for (int i = 1; i < 11; ++i)
+                                //{
+                                //    arrayShoulder_median_filter.Add(last_shoulder + diff_shoulder_data * i / 4);
+                                //}
+                                arrayShoulder_median_filter.Add(shoulderData);
                             }
                             else//首次数据不等分
                             {
@@ -253,6 +272,34 @@ namespace LightBuzz.Vituvius.Samples.WPF
                             }
 
                             adsSendData(shoulderData, elbowData, wristData, hand_status);
+
+                            if (arrayElbow_median_filter.Count == 1)
+                            {
+                                adsSendShoulder(shoulderData);
+                                arrayShoulder_send.Add(shoulderData);
+                            }
+
+                            if (shoulder_counter == 30)
+                            {
+                                shoulder_counter = 0;
+                                double last_angle = arrayShoulder_median_filter[arrayShoulder_median_filter.Count - 31];
+                                double err_angle = arrayShoulder_median_filter[arrayShoulder_median_filter.Count - 1] - last_angle;
+                                if (Math.Abs(err_angle) > 30)
+                                {
+                                    int piece = (int)Math.Abs(err_angle) / 30 + 1;    //分割份数
+                                    for (int i = 0; i < piece; ++i)
+                                    {
+                                        adsSendShoulder(last_angle + err_angle/piece * (i + 1));
+                                        arrayShoulder_send.Add(last_angle + err_angle / piece * (i + 1));
+                                    }
+                                }
+                                else
+                                {
+                                    adsSendShoulder(shoulderData);
+                                    arrayShoulder_send.Add(shoulderData);
+                                }
+                            }
+                            ++shoulder_counter;
                         }
                     }
                 }
