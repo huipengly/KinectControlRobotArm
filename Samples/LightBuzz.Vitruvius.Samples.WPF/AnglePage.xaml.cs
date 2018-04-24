@@ -105,7 +105,7 @@ namespace LightBuzz.Vituvius.Samples.WPF
             binWriter.Write(wrist);
             binWriter.Write(hand);
 
-            //_tcClient.ReadWrite(0x1, 0x1, null, adsWriteStream);
+            _tcClient.ReadWrite(0x1, 0x1, null, adsWriteStream);
         }
 
         private void adsSendShoulder(double shoulderLevelShift)
@@ -117,7 +117,7 @@ namespace LightBuzz.Vituvius.Samples.WPF
 
             binWriter.Write(shoulderLevelShift);
 
-            //_tcClient.ReadWrite(0x1, 0x2, null, adsWriteStream);
+            _tcClient.ReadWrite(0x1, 0x2, null, adsWriteStream);
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -216,6 +216,7 @@ namespace LightBuzz.Vituvius.Samples.WPF
                             {
                                 hand_status = body.HandRightState.GetHashCode();
                                 tblAngle4.Text = body.HandRightState.ToString();
+                                tblAngle6.Text = "L";
                                 lasso_counter = 0;
                             }
                         }

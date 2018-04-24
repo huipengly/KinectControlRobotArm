@@ -68,6 +68,14 @@
                         <Run x:Name="tblAngle5" Text="-" />
                     </TextBlock>
                 </Border>
+                <Border Width="20" Margin="10,0">
+                    <Border.Background>
+                        <SolidColorBrush Color="Gray" Opacity="0.7" />
+                    </Border.Background>
+                    <TextBlock Style="{StaticResource HeaderTextBlockStyle}" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Run x:Name="tblAngle6" Text="-" />
+                    </TextBlock>
+                </Border>
             </StackPanel>
         </Grid>
 
